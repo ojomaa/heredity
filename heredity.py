@@ -140,8 +140,10 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         * everyone not in set` have_trait` does not have the trait.
     """
 
-    prob_dict = {}
+    
     print(people)
+    
+    # collect data (mother, father, unconditional probability, trait probability)
     for name in people:
         gene_number = (2 if name in two_genes else (1 if name in one_gene else 0))
         trait = (True if name in have_trait else False)
@@ -153,12 +155,16 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         father = people[name]['father']
         print(name, gene_number, trait, un_prob, cond_prob, mother, father)
 
+        # if mother or father, probability is standard
         if mother is None and father is None:
             probability = un_prob * cond_prob
             print(probability)
 
+        # if son, calculate conditional probability
         else:
             print(mother, father)
+    
+    #calculate joint probability
             
 
         
