@@ -139,14 +139,30 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         * everyone in set `have_trait` has the trait, and
         * everyone not in set` have_trait` does not have the trait.
     """
-    print('people: ', people)
 
-    # One Gene
-    print('one gene: ', one_gene)
-    # Two Gene
-    print('two genes: ', two_genes)
-    # Have Trait
-    print('trait: ', have_trait)
+    prob_dict = {}
+    print(people)
+    for name in people:
+        gene_number = (2 if name in two_genes else (1 if name in one_gene else 0))
+        trait = (True if name in have_trait else False)
+
+        un_prob = PROBS["gene"][gene_number]
+        cond_prob = PROBS["trait"][gene_number][trait]
+
+        mother = people[name]['mother']
+        father = people[name]['father']
+        print(name, gene_number, trait, un_prob, cond_prob, mother, father)
+
+        if mother is None and father is None:
+            probability = un_prob * cond_prob
+            print(probability)
+
+        else:
+            print(mother, father)
+            
+
+        
+
 
 def update(probabilities, one_gene, two_genes, have_trait, p):
     """
