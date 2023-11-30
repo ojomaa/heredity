@@ -183,6 +183,7 @@ def joint_probability(people, one_gene, two_genes, have_trait):
     for value in person_probability.values():
         combined_probability *= value
 
+    # Return Joint Probability
     return combined_probability
 
 
@@ -193,7 +194,17 @@ def update(probabilities, one_gene, two_genes, have_trait, p):
     Which value for each distribution is updated depends on whether
     the person is in `have_gene` and `have_trait`, respectively.
     """
-    raise NotImplementedError
+    # Iterate over each person
+    for person in probabilities:
+
+        # Assign gene number and trait
+        gene_number = (2 if person in two_genes else (1 if person in one_gene else 0))
+        trait = (True if person in have_trait else False)
+
+        # Add joint probability to gene and trait
+        probabilities[person]['gene'][gene_number] += p
+        probabilities[person]['trait'][trait] += p
+
 
 
 def normalize(probabilities):
@@ -201,7 +212,15 @@ def normalize(probabilities):
     Update `probabilities` such that each probability distribution
     is normalized (i.e., sums to 1, with relative proportions the same).
     """
-    raise NotImplementedError
+    for person in probabilities:
+        sum_gene_values = sum(probabilities[person]['gene'].values())
+        sum_trait_values = sum(probabilities[person]['trait'].values())
+
+        normalized_gene_values = {key: value / sum_gene_values for key, value in probabilities[person]['gene'].items()}
+        normalized_trait_values = {key: value / sum_trait_values for key, value in probabilities[person]['trait'].items()}
+
+        probabilities[person]['gene'] = normalized_gene_values
+        probabilities[person]['trait'] = normalized_trait_values
 
 
 if __name__ == "__main__":
