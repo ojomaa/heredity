@@ -140,34 +140,50 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         * everyone not in set` have_trait` does not have the trait.
     """
 
-    
-    print(people)
-    
-    # collect data (mother, father, unconditional probability, trait probability)
+    person_probability = {}
+
+    # Iterate over each person
     for name in people:
+
+        # Collect data (mother, father, unconditional probability, trait probability)
         gene_number = (2 if name in two_genes else (1 if name in one_gene else 0))
         trait = (True if name in have_trait else False)
 
-        un_prob = PROBS["gene"][gene_number]
-        cond_prob = PROBS["trait"][gene_number][trait]
-
+        unconditional_prob = PROBS["gene"][gene_number]
+        trait_prob = PROBS["trait"][gene_number][trait]
         mother = people[name]['mother']
         father = people[name]['father']
-        print(name, gene_number, trait, un_prob, cond_prob, mother, father)
 
-        # if mother or father, probability is standard
+        # If no mother or father, probability is standard
         if mother is None and father is None:
-            probability = un_prob * cond_prob
-            print(probability)
+            probability = unconditional_prob * trait_prob
+            person_probability[name] = probability
 
-        # if son, calculate conditional probability
+        # If child has mother or father, calculate conditional probability
         else:
-            print(mother, father)
-    
-    #calculate joint probability
-            
+            mother_prob = (PROBS["mutation"] if mother not in one_gene and mother not in two_genes else(0.5 if mother in one_gene else 1-PROBS["mutation"]))
+            father_prob = (PROBS["mutation"] if father not in one_gene and father not in two_genes else(0.5 if father in one_gene else 1-PROBS["mutation"]))
+            not_mother = 1 - mother_prob
+            not_father = 1 - father_prob
 
-        
+            if gene_number == 0:
+                probability = not_father * not_mother
+            elif gene_number == 1:
+                probability = (mother_prob * not_father) + (father_prob * not_mother) 
+            elif gene_number == 2:
+                probability = mother_prob * father_prob
+            
+            # Calculate child probability 
+            probability = probability * PROBS["trait"][gene_number][trait]
+            person_probability[name] = probability
+                
+    
+    # Calculate joint probability
+    combined_probability = 1
+    for value in person_probability.values():
+        combined_probability *= value
+
+    return combined_probability
 
 
 def update(probabilities, one_gene, two_genes, have_trait, p):
